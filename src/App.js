@@ -43,7 +43,10 @@ function App() {
                     <td class="py-4 px-6">
                       <button
                         disabled={!item.is_unlock}
-                        className='btn cursor-pointer btn-xs bg-transparent border border-green-400 px-4 py-1 text-green-400 rounded-md'>Next</button>
+                        onClick={() => {
+                          console.log('clicked');
+                        }}
+                        className={`btn btn-xs border border-green-400 px-4 py-1  rounded-md ${item.is_unlock ? "bg-transparent text-green-400 cursor-pointer hover:bg-green-400 hover:text-white transition-all delay-100" : "bg-gray-400 text-white"}`}>Next</button>
                     </td>
                   </tr>
                 )
