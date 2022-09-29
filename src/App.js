@@ -4,6 +4,7 @@ import './App.css';
 function App() {
   const [classes, setClasses] = useState([]);
   const [lastUnlocked, setLastUnlocked] = useState(0);
+  const time_now = new Date().toLocaleTimeString();
 
   const getClasses = async () => {
     const response = await fetch('http://localhost:5000/classes');
@@ -27,7 +28,7 @@ function App() {
   }, [lastUnlocked, classes]);
 
   const updateClasses = async () => {
-    if (lastUnlocked) {
+    if ((lastUnlocked || lastUnlocked === 0) && time_now === '10:00:00 PM') {
       const classToUnlock = classes[lastUnlocked + 1];
 
       const response = await fetch(`http://localhost:5000/classes/${classToUnlock._id}`, {
@@ -38,43 +39,40 @@ function App() {
         body: JSON.stringify({ is_unlock: true }),
       });
       const data = await response.json();
+      console.log(data);
     }
-
-
-
-
-
-
-
-    // const response = await fetch('http://localhost:5000/classes', {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(classes),
-    // });
-    // const data = await response.json();
-    // setClasses(data);
+    return;
   };
-  if (lastUnlocked) {
-    setTimeout(() => {
-      updateClasses();
+
+  const runOneTime = () => {
+    let exicuted = false;
+    if (!exicuted) {
+      if ((lastUnlocked || lastUnlocked === 0) && time_now === '10:00:00 PM') {
+        setTimeout(() => {
+          updateClasses();
+        }
+          , 10000);
+      }
+      exicuted = true;
     }
-      , 1000 * 60 * 60 * 24);
-  }
+  };
 
-  var time_start = new Date();
-  var time_end = new Date();
-  var tomorrow_date = (time_start.getDate() + 1) + "-" + (time_start.getMonth() + 1) + "-" + time_start.getFullYear();
-  var value_start = "10:00:00".split(':');
-  var value_end = "10:00:00".split(':');
+  useEffect(() => {
+    runOneTime();
+  }, [lastUnlocked, classes]);
 
-  time_start.setHours(value_start[0], value_start[1], value_start[2], 0)
-  time_end.setHours(value_end[0], value_end[1], value_end[2], 0)
+  // const time_start = new Date();
+  // const tomorrow = new Date();
+  // tomorrow.setDate(tomorrow.getDate() + 1);
+  // tomorrow.setHours(0, 0, 0, 0);
 
-  console.log(tomorrow_date)
 
-  // console.log(classes[lastUnlocked + 1]);
+  // const value_start = new Date().toLocaleTimeString().split(':');
+  // const value_end = "01:00:00".split(':');
+
+  // time_start.setHours(value_start[0], value_start[1], value_start[2].split(' ')[0], 0)
+  // tomorrow.setHours(value_end[0], value_end[1], value_end[2], 0)
+
   return (
     <div className='container mx-auto my-10'>
       <div className="overflow-x-auto relative">
