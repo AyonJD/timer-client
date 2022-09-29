@@ -69,9 +69,6 @@ function App() {
   // const value_start = new Date().toLocaleTimeString().split(':');
   // const value_end = "01:00:00".split(':');
 
-  // time_start.setHours(value_start[0], value_start[1], value_start[2].split(' ')[0], 0)
-  // tomorrow.setHours(value_end[0], value_end[1], value_end[2], 0)
-
   return (
     <div className='container mx-auto my-10'>
       <div className="overflow-x-auto relative">
