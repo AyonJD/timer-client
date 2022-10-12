@@ -3,6 +3,7 @@ import './App.css';
 
 function App() {
   const [classes, setClasses] = useState([]);
+  const [refetch, setRefetch] = useState(false);
   const [lastUnlocked, setLastUnlocked] = useState(0);
   const [time, setTime] = useState(new Date().toLocaleTimeString());
 
@@ -21,7 +22,7 @@ function App() {
   };
   useEffect(() => {
     getClasses();
-  }, []);
+  }, [refetch]);
 
   //put is_unlock = true in every class after 24 hours
 
@@ -67,6 +68,7 @@ function App() {
   useEffect(() => {
     if ((lastUnlocked || lastUnlocked === 0) && time === '10:00:00 PM') {
       runOneTime();
+      setRefetch(!refetch);
     }
   });
 
