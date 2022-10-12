@@ -4,7 +4,15 @@ import './App.css';
 function App() {
   const [classes, setClasses] = useState([]);
   const [lastUnlocked, setLastUnlocked] = useState(0);
-  const time_now = new Date().toLocaleTimeString();
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
 
   const getClasses = async () => {
     const response = await fetch('http://localhost:5000/classes');
@@ -27,47 +35,40 @@ function App() {
     setLastUnlocked(lastUnlocked);
   }, [lastUnlocked, classes]);
 
-  const updateClasses = async () => {
-    if ((lastUnlocked || lastUnlocked === 0) && time_now === '10:00:00 PM') {
-      const classToUnlock = classes[lastUnlocked + 1];
 
-      const response = await fetch(`http://localhost:5000/classes/${classToUnlock._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify({ is_unlock: true }),
-      });
-      const data = await response.json();
-      console.log(data);
-    }
+  const updateClasses = async () => {
+
+    const classToUnlock = classes[lastUnlocked + 1];
+
+    const response = await fetch(`http://localhost:5000/classes/${classToUnlock._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify({ is_unlock: true }),
+    });
+    const data = await response.json();
+    console.log(data);
+
     return;
   };
 
   const runOneTime = () => {
     let exicuted = false;
     if (!exicuted) {
-      if ((lastUnlocked || lastUnlocked === 0) && time_now === '10:00:00 PM') {
-        setTimeout(() => {
-          updateClasses();
-        }
-          , 10000);
+      setTimeout(() => {
+        updateClasses();
       }
+        , 86400000);
       exicuted = true;
     }
   };
 
   useEffect(() => {
-    runOneTime();
-  }, [lastUnlocked, classes]);
-
-  // const time_start = new Date();
-  // const tomorrow = new Date(); 
-  // tomorrow.setDate(tomorrow.getDate() + 1);
-  // tomorrow.setHours(0, 0, 0, 0);
-
-  // const value_start = new Date().toLocaleTimeString().split(':');
-  // const value_end = "01:00:00".split(':');
+    if ((lastUnlocked || lastUnlocked === 0) && time === '10:00:00 PM') {
+      runOneTime();
+    }
+  });
 
   return (
     <div className='container mx-auto my-10'>
