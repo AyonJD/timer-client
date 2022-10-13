@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import './App.css';
 
 function App() {
@@ -50,7 +51,11 @@ function App() {
     });
     const data = await response.json();
     console.log(data);
-
+    if (data.status === 200) {
+      toast.success(data.message, {
+        id: 'unlocked',
+      });
+    }
     return;
   };
 
@@ -60,60 +65,80 @@ function App() {
       setTimeout(() => {
         updateClasses();
       }
-        , 86400000);
+        , 10000);
       exicuted = true;
     }
   };
 
   useEffect(() => {
-    if ((lastUnlocked || lastUnlocked === 0) && time === '10:00:00 PM') {
+    if ((lastUnlocked || lastUnlocked === 0) && time === '12:09:00 PM') {
       runOneTime();
       setRefetch(!refetch);
     }
   });
 
+  const handleComplete = async (id) => {
+    const response = await fetch(`http://localhost:5000/classes?id=${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify({ is_complete: true }),
+    });
+    const data = await response.json();
+    if (data.result === 'success') {
+      toast.success('Class completed', {
+        id: 'completed',
+      });
+      setRefetch(!refetch);
+    }
+  }
+
   return (
-    <div className='container mx-auto my-10'>
-      <div className="overflow-x-auto relative">
-        <table className="w-full text-sm text-left text-gray-400">
-          <thead class="text-xs bg-black uppercasebg-gray-700 text-gray-400">
-            <tr>
-              <th scope="col" class="py-3 px-6 rounded-tl-lg">
-                Serial
-              </th>
-              <th scope="col" class="py-3 px-6">Module</th>
-              <th scope="col" class="py-3 px-6">Lock</th>
-              <th scope="col" class="py-3 px-6">Status</th>
-              <th scope="col" class="py-3 px-6 rounded-tr-lg">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              classes.map((item, index) => {
-                return (
-                  <tr key={index} class="bg-gray-800">
-                    <td class="py-4 px-6">{index + 1}</td>
-                    <td class="py-4 px-6">{item.name}</td>
-                    <td class="py-4 px-6">{item.is_unlock ? "Unlocked" : "Locked"}</td>
-                    <td class="py-4 px-6">{item.is_complete ? "Complete" : "Not complete"}</td>
-                    <td class="py-4 px-6">
-                      <button
-                        disabled={!item.is_unlock}
-                        onClick={() => {
-                          console.log('clicked');
-                        }}
-                        className={`btn btn-xs border border-green-400 px-4 py-1  rounded-md ${item.is_unlock ? "bg-transparent text-green-400 cursor-pointer hover:bg-green-400 hover:text-white transition-all delay-100" : "bg-gray-400 text-white"}`}>Next</button>
-                    </td>
-                  </tr>
-                )
-              })
-            }
-          </tbody>
-        </table>
+    <>
+      <div className='container mx-auto my-10'>
+        <div className="overflow-x-auto relative">
+          <table className="w-full text-sm text-left text-gray-400">
+            <thead class="text-xs bg-black uppercasebg-gray-700 text-gray-400">
+              <tr>
+                <th scope="col" class="py-3 px-6 rounded-tl-lg">
+                  Serial
+                </th>
+                <th scope="col" class="py-3 px-6">Module</th>
+                <th scope="col" class="py-3 px-6">Lock</th>
+                <th scope="col" class="py-3 px-6">Status</th>
+                <th scope="col" class="py-3 px-6 rounded-tr-lg">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                classes.map((item, index) => {
+                  return (
+                    <tr key={index} class="bg-gray-800">
+                      <td class="py-4 px-6">{index + 1}</td>
+                      <td class="py-4 px-6">{item.name}</td>
+                      <td class="py-4 px-6">{item.is_unlock ? "Unlocked" : "Locked"}</td>
+                      <td class="py-4 px-6">{item.is_complete ? "Complete" : "Not complete"}</td>
+                      <td class="py-4 px-6">
+                        <button
+                          disabled={!item.is_unlock}
+                          onClick={() => {
+                            handleComplete(item._id);
+                          }}
+                          className={`btn btn-xs border border-green-400 px-4 py-1  rounded-md ${item.is_unlock ? "bg-transparent text-green-400 cursor-pointer hover:bg-green-400 hover:text-white transition-all delay-100" : "bg-gray-400 text-white"}`}>Next</button>
+                      </td>
+                    </tr>
+                  )
+                })
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+      <Toaster />
+    </>
   );
 }
 
