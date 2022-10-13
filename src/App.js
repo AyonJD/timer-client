@@ -65,13 +65,13 @@ function App() {
       setTimeout(() => {
         updateClasses();
       }
-        , 10000);
+        , 86400000);
       exicuted = true;
     }
   };
 
   useEffect(() => {
-    if ((lastUnlocked || lastUnlocked === 0) && time === '12:09:00 PM') {
+    if ((lastUnlocked || lastUnlocked === 0) && time === '10:00:00 PM') {
       runOneTime();
       setRefetch(!refetch);
     }
